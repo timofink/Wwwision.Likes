@@ -1,0 +1,19 @@
+{
+    "description": "Simple Neos Flow package that allows to track arbitrary \"likes\" or recommendations",
+    "type": "neos-package",
+    "name": "wwwision/likes",
+    "require": {
+        "neos/flow": "^4.0",
+        "neos/event-sourcing": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wwwision\\Likes\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Wwwision.Likes"
+        }
+    }
+}
