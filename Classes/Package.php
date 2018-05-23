@@ -4,6 +4,7 @@ namespace Wwwision\Likes;
 use Neos\EventSourcing\Event\EventInterface;
 use Neos\EventSourcing\Event\EventPublisher;
 use Neos\Flow\Cli\CommandRequestHandler;
+use Neos\Flow\Configuration\ConfigurationManager;
 use Neos\Flow\Core\Bootstrap;
 use Neos\Flow\Http\HttpRequestHandlerInterface;
 use Neos\Flow\Package\Package as BasePackage;
@@ -33,12 +34,26 @@ final class Package extends BasePackage
                 return;
             }
             $httpRequest = $requestHandler->getHttpRequest();
-            $metadata['Wwwision.Likes:Client'] = [
-                'url' => (string)$httpRequest->getUri(),
-                'method' => $httpRequest->getMethod(),
-                'clientIpAddress' => $httpRequest->getClientIpAddress(),
-                'userAgent' => $httpRequest->getHeader('User-Agent')
-            ];
+
+            $configurationManager = $bootstrap->getObjectManager()->get(ConfigurationManager::class);
+            $settings = $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, $this->getPackageKey());
+
+            $metadataParts = [];
+            if (isset($settings['eventMetadata']['url']) && $settings['eventMetadata']['url'] === true) {
+                $metadataParts['url'] = (string)$httpRequest->getUri();
+            }
+            if (isset($settings['eventMetadata']['method']) && $settings['eventMetadata']['method'] === true) {
+                $metadataParts['method'] = $httpRequest->getMethod();
+            }
+            if (isset($settings['eventMetadata']['clientIpAddress']) && $settings['eventMetadata']['clientIpAddress'] === true) {
+                $metadataParts['clientIpAddress'] = $httpRequest->getClientIpAddress();
+            }
+            if (isset($settings['eventMetadata']['userAgent']) && $settings['eventMetadata']['userAgent'] === true) {
+                $metadataParts['userAgent'] = $httpRequest->getHeader('User-Agent');
+            }
+            if ($metadataParts !== []) {
+                $metadata['Wwwision.Likes:Client'] = $metadataParts;
+            }
         });
 
     }

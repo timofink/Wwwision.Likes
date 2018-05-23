@@ -1,0 +1,11 @@
+Wwwision:
+  Likes:
+    eventMetadata:
+      # enable tracking of absolute HTTP request URL
+      url: true
+      # enable tracking of HTTP request Method (GET, POST, ...)
+      method: true
+      # enable tracking of users IP address
+      clientIpAddress: true
+      # enable tracking of browsers "userAgent" header
+      userAgent: true
