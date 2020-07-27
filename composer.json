@@ -3,7 +3,7 @@
     "type": "neos-package",
     "name": "wwwision/likes",
     "require": {
-        "neos/flow": "5.*",
+        "neos/flow": "*",
         "neos/event-sourcing": "*"
     },
     "autoload": {
