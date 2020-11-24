@@ -4,7 +4,7 @@
     "name": "wwwision/likes",
     "require": {
         "neos/flow": "*",
-        "neos/event-sourcing": "*",
+        "neos/event-sourcing": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master"
