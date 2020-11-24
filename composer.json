@@ -3,8 +3,8 @@
     "type": "neos-package",
     "name": "wwwision/likes",
     "require": {
-        "neos/flow": "*",
-        "neos/event-sourcing": "*"
+        "neos/flow": "^6.0.0",
+        "neos/event-sourcing": "^2.2.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master"
