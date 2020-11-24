@@ -1,9 +1,7 @@
 <?php
 namespace Wwwision\Likes\Domain\Event;
 
-use Neos\EventSourcing\Event\EventInterface;
-
-final class LikeWasRevoked implements EventInterface
+final class LikeWasRevoked implements LikeEventInterface
 {
 
     /**

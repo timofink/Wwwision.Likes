@@ -1,74 +1,95 @@
 <?php
 namespace Wwwision\Likes\Projection\Like;
 
-use Neos\EventSourcing\Projection\Doctrine\AbstractDoctrineFinder;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\QueryBuilder;
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Persistence\QueryInterface;
-use Neos\Flow\Persistence\QueryResultInterface;
 
 /**
  * @Flow\Scope("singleton")
  *
  * @internal To be used by the LikeService
  */
-final class LikeFinder extends AbstractDoctrineFinder
+final class LikeFinder
 {
+
     /**
-     * @var array
+     * @var QueryBuilder
      */
-    protected $defaultOrderings = [
-        'userId' => QueryInterface::ORDER_ASCENDING,
-        'subjectType' => QueryInterface::ORDER_ASCENDING
-    ];
+    private $queryBuilder;
 
-    public function findBySubjectType(string $subjectType): QueryResultInterface
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $query = $this->createQuery();
-        return $query->matching(
-                $query->equals('subjectType', $subjectType)
-            )
-            ->execute();
+        $this->queryBuilder = $entityManager->createQueryBuilder()
+            ->select('l')
+            ->from(Like::class, 'l')
+            ->orderBy('l.userId')
+            ->addOrderBy('l.subjectType');
     }
 
-    public function findBySubjectTypeAndUserId(string $subjectType, string $userId): QueryResultInterface
+    public function findBySubjectType(string $subjectType): array
     {
-        $query = $this->createQuery();
-        return $query->matching(
-                $query->logicalAnd(
-                    $query->equals('subjectType', $subjectType),
-                    $query->equals('userId', $userId)
-                )
-            )
-            ->execute();
-    }
-
-    public function hasOneWithSubjectTypeUserIdAndSubjectId(string $subjectType, string $userId, string $subjectId): bool
-    {
-        $query = $this->createQuery();
-        $like = $query->matching(
-                $query->logicalAnd(
-                    $query->equals('subjectType', $subjectType),
-                    $query->equals('userId', $userId),
-                    $query->equals('subjectId', $subjectId)
-                )
-            )
-            ->execute()
-            ->getFirst();
-        return $like !== null;
-    }
-
-    public function countBySubjectTypeAndSubjectId(string $subjectType, string $subjectId): int
-    {
-        $query = $this->createQuery();
-        $queryBuilder = $query->getQueryBuilder();
-        $queryBuilder
-            ->select('COUNT(e)')
-            ->where('e.subjectType = :subjectType')
-            ->andWhere('e.subjectId = :subjectId')
+        $query = $this->queryBuilder
+            ->where('l.subjectType = :subjectType')
             ->setParameters([
                 'subjectType' => $subjectType,
-                'subjectId' => $subjectId]
-            );
-        return (int)$queryBuilder->getQuery()->getSingleScalarResult();
+            ])
+            ->getQuery();
+        return $query->execute();
+    }
+
+    public function findBySubjectTypeAndUserId(string $subjectType, string $userId): array
+    {
+        $query = $this->queryBuilder
+            ->where('l.subjectType = :subjectType')
+            ->andWhere('l.userId = :userId')
+            ->setParameters(compact('subjectType', 'userId'))
+            ->getQuery();
+        return $query->execute();
+    }
+
+    /**
+     * @param string $subjectType
+     * @param string $userId
+     * @param string $subjectId
+     * @return bool
+     */
+    public function hasOneWithSubjectTypeUserIdAndSubjectId(string $subjectType, string $userId, string $subjectId): bool
+    {
+        $query = $this->queryBuilder
+            ->select('COUNT(l)')
+            ->where('l.subjectType = :subjectType')
+            ->andWhere('l.userId = :userId')
+            ->andWhere('l.subjectId = :subjectId')
+            ->setParameters(compact('subjectType', 'userId', 'subjectId'))
+            ->getQuery();
+        try {
+            return (int)$query->getSingleScalarResult() > 0;
+        } catch (NoResultException | NonUniqueResultException $e) {
+            throw new \RuntimeException(sprintf('Failed to determine number of likes for subject type "%s", user id "%s" and subject id "%s": %s', $subjectType, $userId, $subjectId, $e->getMessage()), 1605880811, $e);
+        }
+    }
+
+    /**
+     * @param string $subjectType
+     * @param string $subjectId
+     * @return int
+     */
+    public function countBySubjectTypeAndSubjectId(string $subjectType, string $subjectId): int
+    {
+        $query = $this->queryBuilder
+            ->select('COUNT(l)')
+            ->where('l.subjectType = :subjectType')
+            ->andWhere('l.subjectId = :subjectId')
+            ->setParameters(compact('subjectType', 'subjectId'))
+            ->getQuery();
+        try {
+            return (int)$query->getSingleScalarResult();
+        } catch (NoResultException | NonUniqueResultException $e) {
+            throw new \RuntimeException(sprintf('Failed to determine number of likes for subject type "%s" and subject id "%s": %s', $subjectType, $subjectId, $e->getMessage()), 1605880845, $e);
+        }
+
     }
 }

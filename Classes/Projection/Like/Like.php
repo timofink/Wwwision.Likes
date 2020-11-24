@@ -3,15 +3,13 @@ namespace Wwwision\Likes\Projection\Like;
 
 use Doctrine\ORM\Mapping as ORM;
 use Neos\Flow\Annotations as Flow;
-use Neos\EventSourcing\Annotations as ES;
 
 /**
- * @Flow\Entity
- * @ES\ReadModel
+ * @Flow\Entity(readOnly=true)
  * @ORM\Table(name="wwwision_likes_like")
  */
 
-final class Like implements \JsonSerializable
+class Like implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -41,7 +39,7 @@ final class Like implements \JsonSerializable
     /**
      * @return string
      */
-    public function getSubjectType()
+    public function getSubjectType(): string
     {
         return $this->subjectType;
     }
@@ -49,7 +47,7 @@ final class Like implements \JsonSerializable
     /**
      * @return string
      */
-    public function getUserId()
+    public function getUserId(): string
     {
         return $this->userId;
     }
@@ -57,7 +55,7 @@ final class Like implements \JsonSerializable
     /**
      * @return string
      */
-    public function getSubjectId()
+    public function getSubjectId(): string
     {
         return $this->subjectId;
     }

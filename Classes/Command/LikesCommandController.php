@@ -26,7 +26,7 @@ final class LikesCommandController extends CommandController
      * @param string $user
      * @param string $subject
      */
-    public function addCommand($type, $user, $subject)
+    public function addCommand(string $type, string $user, string $subject): void
     {
         $this->likeService->addLike($type, $user, $subject);
         $this->outputLine('Added <b>%s</b> like for user <b>%s</b> and subject <b>%s</b>', [$type, $user, $subject]);
@@ -37,7 +37,7 @@ final class LikesCommandController extends CommandController
      * @param string $user
      * @param string $subject
      */
-    public function revokeCommand($type, $user, $subject)
+    public function revokeCommand(string $type, string $user, string $subject): void
     {
         $this->likeService->revokeLike($type, $user, $subject);
         $this->outputLine('Revoked <b>%s</b> like for user <b>%s</b> and subject <b>%s</b>', [$type, $user, $subject]);
@@ -47,7 +47,7 @@ final class LikesCommandController extends CommandController
      * @param string $type
      * @param string $subject
      */
-    public function countSubjectLikesCommand($type, $subject)
+    public function countSubjectLikesCommand(string $type, string $subject): void
     {
         $number = $this->likeService->getNumberOfLikesBySubject($type, $subject);
         $this->outputLine('There are <b>%d</b> <b>%s</b>-like(s) for subject <b>%s</b>', [$number, $type, $subject]);
@@ -57,24 +57,12 @@ final class LikesCommandController extends CommandController
      * @param string $type
      * @param string $user
      */
-    public function listUserLikesCommand($type, $user)
+    public function listUserLikesCommand(string $type, string $user): void
     {
         $this->outputLine('<b>%s</b>-Likes for user <b>%s</b>:', [$type, $user]);
-        $likes = array_map(function(Like $like) {
+        $likes = array_map(static function(Like $like) {
             return $like->jsonSerialize();
         }, $this->likeService->getLikesBySubjectTypeAndUser($type, $user));
-        $this->output->outputTable($likes, ['Subject Type', 'User ID', 'Subject ID']);
-    }
-
-    /**
-     * @param string $type
-     */
-    public function listLikesCommand($type)
-    {
-        $this->outputLine('All <b>%s</b>-Likes:', [$type]);
-        $likes = array_map(function(Like $like) {
-            return $like->jsonSerialize();
-        }, $this->likeService->getLikesBySubjectType($type));
         $this->output->outputTable($likes, ['Subject Type', 'User ID', 'Subject ID']);
     }
 

@@ -9,3 +9,12 @@ Wwwision:
       clientIpAddress: true
       # enable tracking of browsers "userAgent" header
       userAgent: true
+
+Neos:
+  EventSourcing:
+    EventStore:
+      stores:
+        'Wwwision.Likes:EventStore':
+          storage: 'Neos\EventSourcing\EventStore\Storage\Doctrine\DoctrineEventStorage'
+          listeners:
+            'Wwwision\Likes\.*': true

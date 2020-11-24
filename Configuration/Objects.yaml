@@ -1,0 +1,8 @@
+Wwwision\Likes\LikeService:
+  properties:
+    'eventStore':
+      object:
+        factoryObjectName: Neos\EventSourcing\EventStore\EventStoreFactory
+        arguments:
+          1:
+            value: 'Wwwision.Likes:EventStore'
